@@ -1,0 +1,1812 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HookX Documentation</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tokyo-night-dark.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg-1: #ffffff;
+        --bg-2: #f9fafb;
+        --bg-3: #f3f4f6;
+        --text-1: #111827;
+        --text-2: #6b7280;
+        --text-3: #9ca3af;
+        --accent: #6366f1;
+        --accent-light: #818cf8;
+        --border: #e5e7eb;
+      }
+
+      [x-cloak] {
+        display: none !important;
+      }
+
+      .dark {
+        --bg-1: #0d1117;
+        --bg-2: #161b22;
+        --bg-3: #21262d;
+        --text-1: #e6edf3;
+        --text-2: #8b949e;
+        --text-3: #6e7681;
+        --accent: #7c3aed;
+        --accent-light: #8b5cf6;
+        --border: #30363d;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: var(--bg-1);
+        color: var(--text-1);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        transition: background 0.3s, color 0.3s;
+      }
+
+      /* Header */
+      .header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        z-index: 1000;
+        transition: all 0.3s;
+      }
+
+      .dark .header {
+        background: rgba(13, 17, 23, 0.8);
+      }
+
+      .header-inner {
+        max-width: 1400px;
+        margin: 0 auto;
+        height: 100%;
+        padding: 0 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        color: var(--text-1);
+      }
+
+      .logo-icon {
+        width: 32px;
+        height: 32px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-light));
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 800;
+        font-size: 14px;
+      }
+
+      .logo-text {
+        font-size: 18px;
+        font-weight: 700;
+      }
+
+      /* Search Button */
+      .search-btn {
+        flex: 1;
+        max-width: 400px;
+        padding: 8px 12px;
+        background: var(--bg-2);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .search-btn:hover {
+        border-color: var(--accent);
+      }
+
+      .search-btn-text {
+        flex: 1;
+        color: var(--text-3);
+        font-size: 14px;
+      }
+
+      .kbd {
+        padding: 3px 6px;
+        background: var(--bg-3);
+        border: 1px solid var(--border);
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-2);
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      /* Search Modal */
+      .search-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 10vh 1rem 1rem;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+      }
+
+      .search-container {
+        width: 100%;
+        max-width: 600px;
+        background: var(--bg-1);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+      }
+
+      .search-input-wrapper {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .search-input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        font-size: 16px;
+        color: var(--text-1);
+        outline: none;
+      }
+
+      .search-input::placeholder {
+        color: var(--text-3);
+      }
+
+      .search-results {
+        max-height: 400px;
+        overflow-y: auto;
+      }
+
+      .search-section {
+        padding: 8px 16px;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-3);
+        background: var(--bg-2);
+      }
+
+      .search-result {
+        padding: 12px 16px;
+        cursor: pointer;
+        border-bottom: 1px solid var(--border);
+        transition: background 0.2s;
+      }
+
+      .search-result:hover {
+        background: var(--bg-2);
+      }
+
+      .result-title {
+        font-weight: 600;
+        color: var(--text-1);
+        margin-bottom: 4px;
+        font-size: 14px;
+      }
+
+      .result-snippet {
+        font-size: 13px;
+        color: var(--text-2);
+      }
+
+      .highlight {
+        background: rgba(99, 102, 241, 0.2);
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .search-empty {
+        padding: 3rem 1rem;
+        text-align: center;
+        color: var(--text-3);
+      }
+
+      /* Icon Button */
+      .icon-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: var(--bg-2);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: var(--text-2);
+      }
+
+      .icon-btn:hover {
+        background: var(--bg-3);
+        color: var(--accent);
+      }
+
+      .mobile-menu-btn {
+        display: none;
+      }
+
+      /* Layout */
+      .layout {
+        display: flex;
+        margin-top: 60px;
+        max-width: 1400px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        width: 240px;
+        flex-shrink: 0;
+        height: calc(100vh - 60px);
+        position: sticky;
+        top: 60px;
+        overflow-y: auto;
+        padding: 2rem 1rem;
+        border-right: 1px solid var(--border);
+      }
+
+      .nav-section {
+        margin-bottom: 1.5rem;
+      }
+
+      .nav-title {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-3);
+        margin-bottom: 8px;
+        padding: 0 8px;
+      }
+
+      .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px;
+        color: var(--text-2);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: 6px;
+        transition: all 0.2s;
+        margin-bottom: 2px;
+      }
+
+      .nav-link:hover {
+        background: var(--bg-2);
+        color: var(--text-1);
+      }
+
+      .nav-link.active {
+        background: var(--accent);
+        color: white;
+        font-weight: 600;
+      }
+
+      .nav-icon {
+        width: 16px;
+        height: 16px;
+      }
+
+      /* Content */
+      .content-wrapper {
+        flex: 1;
+        display: flex;
+        min-width: 0;
+      }
+
+      .content {
+        flex: 1;
+        padding: 2.5rem;
+        max-width: 800px;
+      }
+
+      /* Jump To Menu */
+      .jump-menu {
+        width: 220px;
+        flex-shrink: 0;
+        padding: 2rem 1rem;
+      }
+
+      .jump-menu-inner {
+        position: sticky;
+        top: 80px;
+        max-height: calc(100vh - 160px);
+        overflow-y: auto;
+      }
+
+      .jump-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text-3);
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .jump-list {
+        list-style: none;
+      }
+
+      .jump-link {
+        display: block;
+        padding: 6px 0 6px 12px;
+        color: var(--text-2);
+        text-decoration: none;
+        font-size: 13px;
+        border-left: 2px solid transparent;
+        transition: all 0.2s;
+      }
+
+      .jump-link:hover {
+        color: var(--accent);
+        border-left-color: var(--accent);
+      }
+
+      .jump-link.active {
+        color: var(--accent);
+        border-left-color: var(--accent);
+        font-weight: 600;
+      }
+
+      .jump-link.level-3 {
+        padding-left: 24px;
+        font-size: 12px;
+      }
+
+      /* Prose */
+      .prose h1 {
+        font-size: 2.25rem;
+        font-weight: 800;
+        line-height: 1.2;
+        margin-bottom: 1.5rem;
+        letter-spacing: -0.5px;
+      }
+
+      .prose h2 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-top: 2.5rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--border);
+        scroll-margin-top: 80px;
+      }
+
+      .prose h3 {
+        font-size: 1.375rem;
+        font-weight: 600;
+        margin-top: 2rem;
+        margin-bottom: 0.75rem;
+        scroll-margin-top: 80px;
+      }
+
+      .prose h4 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin-top: 1.5rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .prose p {
+        margin: 1rem 0;
+        line-height: 1.7;
+        color: var(--text-2);
+      }
+
+      .prose a {
+        color: var(--accent);
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .prose a:hover {
+        text-decoration: underline;
+      }
+
+      .prose code {
+        background: var(--bg-3);
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.9em;
+        font-weight: 500;
+        font-family: "JetBrains Mono", monospace;
+        color: var(--accent);
+      }
+
+      .prose pre {
+        background: #1a1b26;
+        padding: 1.25rem;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin: 1.25rem 0;
+      }
+
+      .prose pre code {
+        background: transparent;
+        padding: 0;
+        color: inherit;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 1.6;
+      }
+
+      .prose ul,
+      .prose ol {
+        margin: 1rem 0;
+        padding-left: 1.5rem;
+      }
+
+      .prose li {
+        margin: 0.5rem 0;
+        color: var(--text-2);
+      }
+
+      .prose strong {
+        font-weight: 600;
+        color: var(--text-1);
+      }
+
+      .prose hr {
+        border: none;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          var(--border),
+          transparent
+        );
+        margin: 3rem 0;
+        position: relative;
+      }
+
+      .prose hr::before {
+        content: "✦";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background: var(--bg-1);
+        padding: 0 1rem;
+        color: var(--text-3);
+        font-size: 12px;
+      }
+
+      .prose blockquote {
+        border-left: 3px solid var(--accent);
+        padding-left: 1rem;
+        margin: 1rem 0;
+        color: var(--text-2);
+        font-style: italic;
+      }
+
+      /* Responsive */
+      @media (max-width: 1200px) {
+        .jump-menu {
+          display: none;
+        }
+
+        .content {
+          max-width: 100%;
+        }
+      }
+
+      @media (max-width: 1024px) {
+        .mobile-menu-btn {
+          display: flex;
+        }
+
+        .sidebar {
+          position: fixed;
+          left: -280px;
+          top: 60px;
+          z-index: 999;
+          background: var(--bg-1);
+          transition: left 0.3s;
+          box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
+          border-right: 1px solid var(--border);
+        }
+
+        .sidebar.open {
+          left: 0;
+        }
+
+        .content {
+          padding: 2rem 1.5rem;
+        }
+
+        .mobile-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.5);
+          z-index: 998;
+          display: none;
+        }
+
+        .mobile-overlay.show {
+          display: block;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .logo-text {
+          display: none;
+        }
+
+        .search-btn {
+          max-width: 150px;
+        }
+
+        .search-btn-text {
+          font-size: 13px;
+        }
+
+        .kbd {
+          display: none;
+        }
+
+        .header-inner {
+          padding: 0 1rem;
+        }
+
+        .content {
+          padding: 1.5rem 1rem;
+        }
+
+        .next-cards {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .footer-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .footer-bottom {
+          flex-direction: column;
+          gap: 1rem;
+          text-align: center;
+        }
+      }
+
+      /* Code Copy Button */
+      .code-block {
+        position: relative;
+      }
+
+      .copy-btn {
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        padding: 6px 12px;
+        background: var(--bg-2);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-2);
+        cursor: pointer;
+        opacity: 0;
+        transition: all 0.2s;
+      }
+
+      .code-block:hover .copy-btn {
+        opacity: 1;
+      }
+
+      .copy-btn:hover {
+        background: var(--bg-3);
+        color: var(--accent);
+      }
+
+      .copy-btn.copied {
+        color: var(--accent);
+      }
+
+      /* Next Steps Cards */
+      .next-steps {
+        margin: 3rem 0;
+        padding: 2rem;
+        background: linear-gradient(135deg, var(--bg-2), var(--bg-3));
+        border-radius: 12px;
+        border: 1px solid var(--border);
+      }
+
+      .next-steps-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+        color: var(--text-1);
+      }
+
+      .next-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+      }
+
+      .next-card {
+        padding: 1.5rem;
+        background: var(--bg-1);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        text-decoration: none;
+        transition: all 0.3s;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .next-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        border-color: var(--accent);
+      }
+
+      .next-card-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-light));
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        margin-bottom: 0.5rem;
+      }
+
+      .next-card-title {
+        font-size: 1rem;
+        font-weight: 700;
+        color: var(--text-1);
+      }
+
+      .next-card-desc {
+        font-size: 0.875rem;
+        color: var(--text-2);
+        line-height: 1.5;
+      }
+
+      .next-card-arrow {
+        margin-top: auto;
+        color: var(--accent);
+        font-weight: 600;
+        font-size: 0.875rem;
+      }
+
+      /* Sponsor Button */
+      .sponsor-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        background: linear-gradient(135deg, #ec4899, #f43f5e);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 14px;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3);
+      }
+
+      .sponsor-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(236, 72, 153, 0.4);
+      }
+
+      /* Footer */
+      .footer {
+        margin-top: 0;
+        padding: 3rem 2.5rem 2rem;
+        background: linear-gradient(135deg, var(--bg-2), var(--bg-3));
+        border-top: 1px solid var(--border);
+      }
+
+      .footer-content {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      .footer-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .footer-section h4 {
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: var(--text-1);
+      }
+
+      .footer-section p {
+        font-size: 14px;
+        color: var(--text-2);
+        line-height: 1.6;
+        margin-bottom: 1rem;
+      }
+
+      .footer-link {
+        display: block;
+        font-size: 14px;
+        color: var(--text-2);
+        text-decoration: none;
+        margin-bottom: 0.5rem;
+        transition: color 0.2s;
+      }
+
+      .footer-link:hover {
+        color: var(--accent);
+      }
+
+      .footer-bottom {
+        padding-top: 2rem;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 13px;
+        color: var(--text-3);
+      }
+
+      .footer-bottom a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+
+      .footer-bottom a:hover {
+        text-decoration: underline;
+      }
+
+      /* Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 4px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--text-3);
+      }
+
+      @media (max-width: 768px) {
+        .footer-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .footer-bottom {
+          flex-direction: column;
+          gap: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body x-data="docsApp()" x-init="init()" :class="{ 'dark': darkMode }">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-inner">
+        <button
+          @click="sidebarOpen = !sidebarOpen"
+          class="icon-btn mobile-menu-btn"
+        >
+          <svg
+            width="18"
+            height="18"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          </svg>
+        </button>
+
+        <a href="./" class="logo">
+          <div class="logo-icon">Hx</div>
+          <span class="logo-text">HookX</span>
+        </a>
+
+        <div class="search-btn" @click="searchOpen = true">
+          <svg
+            width="18"
+            height="18"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+          <span class="search-btn-text">Search...</span>
+          <div style="display: flex; gap: 4px">
+            <span class="kbd">⌘K</span>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.75rem">
+          <a
+            href="../examples/"
+            style="
+              color: var(--text-2);
+              text-decoration: none;
+              font-weight: 500;
+              font-size: 14px;
+              display: none;
+            "
+            id="examples-link"
+            >Examples</a
+          >
+
+          <a
+            href="https://github.com/sponsors/AlizHarb"
+            target="_blank"
+            class="sponsor-btn"
+          >
+            <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+              />
+            </svg>
+            Sponsor
+          </a>
+
+          <a
+            href="https://github.com/AlizHarb/hookx"
+            target="_blank"
+            class="icon-btn"
+          >
+            <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+              />
+            </svg>
+          </a>
+          <button @click="darkMode = !darkMode" class="icon-btn">
+            <svg
+              x-show="!darkMode"
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+              />
+            </svg>
+            <svg
+              x-show="darkMode"
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Search Modal -->
+    <div
+      x-show="searchOpen"
+      x-cloak
+      class="search-modal"
+      @click.self="searchOpen = false"
+      @keydown.escape.window="searchOpen = false"
+    >
+      <div class="search-container">
+        <div class="search-input-wrapper">
+          <svg
+            width="20"
+            height="20"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            style="color: var(--text-3)"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+          <input
+            type="text"
+            class="search-input"
+            placeholder="Search documentation..."
+            x-model="searchQuery"
+            @input="search()"
+            x-ref="searchInput"
+          />
+        </div>
+
+        <div class="search-results" x-show="searchResults.length > 0">
+          <template
+            x-for="(section, sectionName) in groupedResults"
+            :key="sectionName"
+          >
+            <div>
+              <div class="search-section" x-text="sectionName"></div>
+              <template x-for="result in section" :key="result.id">
+                <div class="search-result" @click="goToResult(result)">
+                  <div class="result-title" x-text="result.title"></div>
+                  <div class="result-snippet" x-html="result.snippet"></div>
+                </div>
+              </template>
+            </div>
+          </template>
+        </div>
+
+        <div
+          x-show="searchQuery.length > 0 && searchResults.length === 0"
+          class="search-empty"
+        >
+          No results found for "<span x-text="searchQuery"></span>"
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Overlay -->
+    <div
+      class="mobile-overlay"
+      :class="{ 'show': sidebarOpen }"
+      @click="sidebarOpen = false"
+    ></div>
+
+    <!-- Layout -->
+    <div class="layout">
+      <!-- Sidebar -->
+      <aside class="sidebar" :class="{ 'open': sidebarOpen }">
+        <div class="nav-section">
+          <div class="nav-title">Getting Started</div>
+          <a
+            href="#"
+            @click.prevent="loadPage('introduction')"
+            class="nav-link"
+            :class="{ 'active': currentPage === 'introduction' }"
+          >
+            <svg
+              class="nav-icon"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            Introduction
+          </a>
+          <a
+            href="#"
+            @click.prevent="loadPage('installation')"
+            class="nav-link"
+            :class="{ 'active': currentPage === 'installation' }"
+          >
+            <svg
+              class="nav-icon"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+              />
+            </svg>
+            Installation
+          </a>
+          <a
+            href="#"
+            @click.prevent="loadPage('basics')"
+            class="nav-link"
+            :class="{ 'active': currentPage === 'basics' }"
+          >
+            <svg
+              class="nav-icon"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 10V3L4 14h7v7l9-11h-7z"
+              />
+            </svg>
+            Basic Usage
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-title">Core Concepts</div>
+          <a
+            href="#"
+            @click.prevent="loadPage('filters')"
+            class="nav-link"
+            :class="{ 'active': currentPage === 'filters' }"
+          >
+            <svg
+              class="nav-icon"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+              />
+            </svg>
+            Filters
+          </a>
+          <a
+            href="#"
+            @click.prevent="loadPage('async')"
+            class="nav-link"
+            :class="{ 'active': currentPage === 'async' }"
+          >
+            <svg
+              class="nav-icon"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M13 10V3L4 14h7v7l9-11h-7z"
+              />
+            </svg>
+            Async Hooks
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-title">Integration</div>
+          <a
+            href="#"
+            @click.prevent="loadPage('integrations')"
+            class="nav-link"
+            :class="{ 'active': currentPage === 'integrations' }"
+          >
+            <svg
+              class="nav-icon"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
+              />
+            </svg>
+            Overview
+          </a>
+          <a
+            href="#"
+            @click.prevent="loadPage('laravel')"
+            class="nav-link"
+            :class="{ 'active': currentPage === 'laravel' }"
+          >
+            <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M23.642 5.43a.364.364 0 01.014.1v5.149c0 .135-.073.26-.189.326l-4.323 2.49v4.934a.378.378 0 01-.188.326L9.93 23.949a.316.316 0 01-.066.027c-.008.002-.016.008-.024.01a.348.348 0 01-.192 0c-.011-.002-.02-.008-.03-.012-.02-.008-.042-.014-.062-.025L.533 18.755a.376.376 0 01-.189-.326V2.974c0-.033.005-.066.014-.098.003-.012.01-.02.014-.032a.369.369 0 01.023-.058c.004-.013.015-.022.023-.033l.033-.045c.012-.01.025-.018.037-.027.014-.012.027-.024.041-.034H.53L5.043.05a.375.375 0 01.375 0L9.93 2.647h.002c.015.01.027.021.04.033l.038.027c.013.014.02.03.033.045.008.011.02.021.025.033.01.02.017.038.024.058.003.011.01.021.013.032.01.031.014.064.014.098v9.652l3.76-2.164V5.527c0-.033.004-.066.013-.098.003-.01.01-.02.013-.032a.487.487 0 01.024-.059c.007-.012.018-.02.025-.033.012-.015.021-.03.033-.043.012-.012.025-.02.037-.028.014-.01.026-.023.041-.032h.001l4.513-2.598a.375.375 0 01.375 0l4.513 2.598c.016.01.027.021.042.031.012.01.025.018.036.028.013.014.022.03.034.044.008.012.019.021.024.033.011.02.018.04.024.06.006.01.012.021.015.032zm-.74 5.032V6.179l-1.578.908-2.182 1.256v4.283zm-4.51 7.75v-4.287l-2.147 1.225-6.126 3.498v4.325zM1.093 3.624v14.588l8.273 4.761v-4.325l-4.322-2.445-.002-.003H5.04c-.014-.01-.025-.021-.04-.031-.011-.01-.024-.018-.035-.027l-.001-.002c-.013-.012-.021-.025-.031-.04-.01-.011-.021-.022-.028-.036v-.001c-.008-.014-.013-.031-.02-.047-.006-.016-.014-.027-.018-.043a.49.49 0 01-.008-.057c-.002-.014-.006-.027-.006-.041V5.789l-2.18-1.257zM5.23.81L1.47 2.974l3.76 2.164 3.758-2.164zm1.956 13.505l2.182-1.256V3.624l-1.58.91-2.182 1.255v9.435zm11.581-10.95l-3.76 2.163 3.76 2.163 3.759-2.164zm-.376 4.978L16.21 7.087 14.63 6.18v4.283l2.182 1.256 1.58.908zm-8.65 9.654l5.514-3.148 2.756-1.572-3.757-2.163-4.323 2.489-3.941 2.27z"
+              />
+            </svg>
+            Laravel
+          </a>
+          <a
+            href="#"
+            @click.prevent="loadPage('symfony')"
+            class="nav-link"
+            :class="{ 'active': currentPage === 'symfony' }"
+          >
+            <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M24 12c0 6.628-5.372 12-12 12S0 18.628 0 12 5.372 0 12 0s12 5.372 12 12zm-6.753-7.561c-1.22.042-2.283.715-3.075 1.957-.878 1.375-1.289 2.993-1.455 4.116-.118.796-.18 1.621-.18 2.461 0 .678.042 1.375.124 2.081.021.185.042.369.07.553.028.18.063.357.105.532.021.091.049.182.077.273.021.07.049.14.077.21.105.273.238.532.399.77.329.469.763.854 1.276 1.12.553.287 1.185.434 1.838.434.511 0 1.023-.084 1.513-.252.49-.168.952-.413 1.374-.728.826-.616 1.513-1.513 1.975-2.582.476-1.106.721-2.38.721-3.682 0-.959-.119-1.918-.357-2.835-.238-.917-.595-1.793-1.064-2.59-.469-.798-1.05-1.513-1.73-2.115-.679-.602-1.457-1.078-2.304-1.415-.847-.336-1.758-.511-2.702-.511-.357 0-.714.028-1.064.084-.35.056-.693.14-1.022.252-.658.224-1.268.553-1.813.973-.546.42-1.022.924-1.415 1.499-.392.574-.693 1.211-.903 1.897-.21.686-.315 1.408-.315 2.143 0 .518.049 1.036.147 1.541.098.504.245.994.441 1.464.196.469.448.91.749 1.316.301.406.658.777 1.064 1.106.406.329.861.609 1.351.833.49.224 1.015.392 1.562.504.546.112 1.113.168 1.688.168.574 0 1.148-.056 1.709-.168.56-.112 1.099-.28 1.604-.504.504-.224.98-.504 1.415-.833.434-.329.826-.707 1.169-1.127.343-.42.63-.882.861-1.373.231-.49.406-1.008.525-1.541.119-.532.18-1.078.18-1.631 0-.553-.049-1.106-.147-1.652-.098-.546-.252-1.078-.462-1.59-.21-.511-.476-.994-.798-1.443-.322-.448-.707-.861-1.148-1.225-.441-.364-.938-.672-1.478-.924-.539-.252-1.12-.441-1.723-.567-.602-.126-1.225-.189-1.855-.189z"
+              />
+            </svg>
+            Symfony
+          </a>
+          <a
+            href="#"
+            @click.prevent="loadPage('wordpress')"
+            class="nav-link"
+            :class="{ 'active': currentPage === 'wordpress' }"
+          >
+            <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24">
+              <path
+                d="M21.469 6.825c.84 1.537 1.318 3.3 1.318 5.175 0 3.979-2.156 7.456-5.363 9.325l3.295-9.527c.615-1.54.82-2.771.82-3.864 0-.405-.026-.78-.07-1.11zm-7.981.105c.647-.03 1.232-.105 1.232-.105.582-.075.514-.93-.067-.899 0 0-1.755.135-2.88.135-1.064 0-2.85-.15-2.85-.15-.585-.03-.661.855-.075.885 0 0 .54.061 1.125.09l1.68 4.605-2.37 7.08L5.354 6.9c.649-.03 1.234-.1 1.234-.1.585-.075.516-.93-.065-.896 0 0-1.746.138-2.874.138-.2 0-.438-.008-.69-.015C5.911 3.15 8.235 1.215 11.4.465c2.088-.496 4.065-.39 5.925.255 1.849.643 3.434 1.764 4.578 3.219h-.199c-1.048 0-1.792.915-1.792 1.897 0 .885.51 1.635.99 2.52.39.705.735 1.485.735 2.385 0 .735-.28 1.59-.646 2.775l-.855 2.85-3.1-9.195zm-14.772 14.772c-1.349-1.636-2.133-3.73-2.133-6.011 0-1.801.507-3.49 1.39-4.945L6.869 20.29c-.015.015-.03.03-.045.045zm6.284 1.471c-1.064 0-2.084-.164-3.05-.465l3.24-9.42 3.32 9.105c.015.045.045.075.06.105-1.11.435-2.31.675-3.57.675z"
+              />
+            </svg>
+            WordPress
+          </a>
+        </div>
+      </aside>
+
+      <!-- Content Wrapper -->
+      <div class="content-wrapper">
+        <!-- Main Content -->
+        <main class="content">
+          <article id="content" class="prose">
+            <div
+              style="text-align: center; padding: 3rem; color: var(--text-3)"
+            >
+              Loading...
+            </div>
+          </article>
+
+          <!-- Next Steps (will be populated dynamically) -->
+          <div id="next-steps"></div>
+        </main>
+
+        <!-- Jump To Menu -->
+        <aside class="jump-menu">
+          <div class="jump-menu-inner">
+            <div class="jump-title">On This Page</div>
+            <ul class="jump-list" id="jump-list"></ul>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <!-- Footer (Full Width) -->
+    <footer class="footer">
+      <div class="footer-content">
+        <div class="footer-grid">
+          <div class="footer-section">
+            <h4>HookX</h4>
+            <p>
+              Modern hook and event system for PHP 8.3+. Built with developer
+              experience in mind.
+            </p>
+            <p style="margin-top: 1rem">
+              <a
+                href="https://github.com/sponsors/AlizHarb"
+                target="_blank"
+                class="sponsor-btn"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                  />
+                </svg>
+                Sponsor
+              </a>
+            </p>
+          </div>
+
+          <div class="footer-section">
+            <h4>Resources</h4>
+            <a
+              href="https://github.com/AlizHarb/hookx"
+              target="_blank"
+              class="footer-link"
+              >GitHub</a
+            >
+            <a
+              href="https://packagist.org/packages/alizharb/hookx"
+              target="_blank"
+              class="footer-link"
+              >Packagist</a
+            >
+            <a href="../examples/" class="footer-link">Examples</a>
+            <a
+              href="https://github.com/AlizHarb/hookx/blob/main/CONTRIBUTING.md"
+              target="_blank"
+              class="footer-link"
+              >Contributing</a
+            >
+          </div>
+
+          <div class="footer-section">
+            <h4>Community</h4>
+            <a
+              href="https://github.com/AlizHarb/hookx/issues"
+              target="_blank"
+              class="footer-link"
+              >Issues</a
+            >
+            <a
+              href="https://github.com/AlizHarb/hookx/discussions"
+              target="_blank"
+              class="footer-link"
+              >Discussions</a
+            >
+            <a
+              href="https://github.com/AlizHarb/hookx/blob/main/LICENSE"
+              target="_blank"
+              class="footer-link"
+              >License</a
+            >
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <div>
+            © 2025
+            <a href="https://github.com/AlizHarb" target="_blank">Ali Harb</a>.
+            All rights reserved.
+          </div>
+          <div>HookX v1.0.0 • MIT License</div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      function docsApp() {
+        return {
+          darkMode: localStorage.getItem("darkMode") === "true",
+          currentPage: "introduction",
+          sidebarOpen: false,
+          searchOpen: false,
+          searchQuery: "",
+          searchResults: [],
+          groupedResults: {},
+          allContent: {},
+
+          pageTitles: {
+            introduction: "Introduction",
+            installation: "Installation",
+            basics: "Basic Usage",
+            filters: "Filters",
+            async: "Async Hooks",
+            integrations: "Integrations Overview",
+            laravel: "Laravel Integration",
+            symfony: "Symfony Integration",
+            wordpress: "WordPress Integration",
+          },
+
+          nextSteps: {
+            introduction: [
+              {
+                title: "Installation",
+                desc: "Get started by installing HookX via Composer",
+                page: "installation",
+                icon: "M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4",
+              },
+              {
+                title: "Basic Usage",
+                desc: "Learn the fundamentals of hooks and filters",
+                page: "basics",
+                icon: "M13 10V3L4 14h7v7l9-11h-7z",
+              },
+            ],
+            installation: [
+              {
+                title: "Basic Usage",
+                desc: "Start using hooks in your application",
+                page: "basics",
+                icon: "M13 10V3L4 14h7v7l9-11h-7z",
+              },
+              {
+                title: "Integrations",
+                desc: "Integrate with Laravel, Symfony, and more",
+                page: "integrations",
+                icon: "M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z",
+              },
+            ],
+            basics: [
+              {
+                title: "Filters",
+                desc: "Transform data with powerful filters",
+                page: "filters",
+                icon: "M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z",
+              },
+              {
+                title: "Async Hooks",
+                desc: "Handle asynchronous operations efficiently",
+                page: "async",
+                icon: "M13 10V3L4 14h7v7l9-11h-7z",
+              },
+            ],
+            filters: [
+              {
+                title: "Async Hooks",
+                desc: "Learn about asynchronous hook execution",
+                page: "async",
+                icon: "M13 10V3L4 14h7v7l9-11h-7z",
+              },
+              {
+                title: "Integrations",
+                desc: "Use filters in your framework",
+                page: "integrations",
+                icon: "M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z",
+              },
+            ],
+            async: [
+              {
+                title: "Integrations",
+                desc: "Integrate async hooks with frameworks",
+                page: "integrations",
+                icon: "M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z",
+              },
+              {
+                title: "Laravel",
+                desc: "Use HookX with Laravel",
+                page: "laravel",
+                icon: "M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4",
+              },
+            ],
+            integrations: [
+              {
+                title: "Laravel",
+                desc: "Integrate with Laravel framework",
+                page: "laravel",
+                icon: "M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4",
+              },
+              {
+                title: "Symfony",
+                desc: "Integrate with Symfony framework",
+                page: "symfony",
+                icon: "M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4",
+              },
+            ],
+            laravel: [
+              {
+                title: "Symfony",
+                desc: "Integrate with Symfony framework",
+                page: "symfony",
+                icon: "M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4",
+              },
+              {
+                title: "Examples",
+                desc: "See real-world examples",
+                page: "../examples/",
+                icon: "M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4",
+              },
+            ],
+            symfony: [
+              {
+                title: "WordPress",
+                desc: "Integrate with WordPress",
+                page: "wordpress",
+                icon: "M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4",
+              },
+              {
+                title: "Examples",
+                desc: "See real-world examples",
+                page: "../examples/",
+                icon: "M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4",
+              },
+            ],
+            wordpress: [
+              {
+                title: "Examples",
+                desc: "Explore working code examples",
+                page: "../examples/",
+                icon: "M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4",
+              },
+              {
+                title: "GitHub",
+                desc: "View source code and contribute",
+                page: "https://github.com/AlizHarb/hookx",
+                icon: "M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4",
+              },
+            ],
+          },
+
+          init() {
+            this.$watch("darkMode", (val) =>
+              localStorage.setItem("darkMode", val)
+            );
+            this.$watch("searchOpen", (val) => {
+              if (val) {
+                setTimeout(() => this.$refs.searchInput.focus(), 100);
+              } else {
+                this.searchQuery = "";
+                this.searchResults = [];
+              }
+            });
+
+            // Preload all pages for search
+            this.preloadPages();
+
+            this.loadPage("introduction");
+
+            // Keyboard shortcuts
+            document.addEventListener("keydown", (e) => {
+              if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+                e.preventDefault();
+                this.searchOpen = true;
+              }
+            });
+
+            // Scroll spy for jump menu
+            window.addEventListener("scroll", () => this.updateActiveJump());
+          },
+
+          async preloadPages() {
+            // Load all pages in background for search
+            const pages = [
+              "introduction",
+              "installation",
+              "basics",
+              "filters",
+              "async",
+              "integrations",
+              "laravel",
+              "symfony",
+              "wordpress",
+            ];
+            for (const page of pages) {
+              try {
+                const response = await fetch(`${page}.md`);
+                if (response.ok) {
+                  const markdown = await response.text();
+                  this.allContent[page] = markdown;
+                }
+              } catch (error) {
+                console.log(`Could not preload ${page}`);
+              }
+            }
+          },
+
+          async loadPage(page) {
+            this.currentPage = page;
+            this.sidebarOpen = false;
+
+            const contentEl = document.getElementById("content");
+            contentEl.innerHTML =
+              '<div style="text-align: center; padding: 3rem; color: var(--text-3);">Loading...</div>';
+
+            try {
+              const response = await fetch(`${page}.md`);
+              if (!response.ok) throw new Error("Not found");
+
+              const markdown = await response.text();
+              this.allContent[page] = markdown;
+
+              const html = marked.parse(markdown);
+              contentEl.innerHTML = html;
+
+              // Add copy buttons to code blocks
+              this.addCopyButtons();
+
+              // Highlight code
+              contentEl
+                .querySelectorAll("pre code")
+                .forEach((block) => hljs.highlightElement(block));
+
+              // Generate jump menu
+              this.generateJumpMenu();
+
+              // Generate next steps
+              this.generateNextSteps();
+
+              document.title = `${this.pageTitles[page]} - HookX`;
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            } catch (error) {
+              contentEl.innerHTML =
+                '<div style="padding: 2rem; background: var(--bg-2); border-radius: 8px;"><h3>Error</h3><p>Could not load page.</p></div>';
+            }
+          },
+
+          addCopyButtons() {
+            const codeBlocks = document.querySelectorAll(".prose pre");
+            codeBlocks.forEach((block) => {
+              block.classList.add("code-block");
+
+              const button = document.createElement("button");
+              button.className = "copy-btn";
+              button.textContent = "Copy";
+              button.onclick = () => this.copyCode(button, block);
+
+              block.appendChild(button);
+            });
+          },
+
+          copyCode(button, block) {
+            const code = block.querySelector("code").textContent;
+            navigator.clipboard.writeText(code).then(() => {
+              button.textContent = "Copied!";
+              button.classList.add("copied");
+              setTimeout(() => {
+                button.textContent = "Copy";
+                button.classList.remove("copied");
+              }, 2000);
+            });
+          },
+
+          generateNextSteps() {
+            const nextStepsEl = document.getElementById("next-steps");
+            const steps = this.nextSteps[this.currentPage];
+
+            if (!steps || steps.length === 0) {
+              nextStepsEl.innerHTML = "";
+              return;
+            }
+
+            let html =
+              '<div class="next-steps"><div class="next-steps-title">Next Steps</div><div class="next-cards">';
+
+            steps.forEach((step) => {
+              const isExternal =
+                step.page.startsWith("http") || step.page.startsWith("../");
+              const clickHandler = isExternal
+                ? ""
+                : `onclick="window.docsAppInstance.loadPage('${step.page}'); return false;"`;
+
+              html += `
+                            <a href="${
+                              isExternal ? step.page : "#"
+                            }" ${clickHandler} class="next-card" ${
+                isExternal ? 'target="_blank"' : ""
+              }>
+                                <div class="next-card-icon">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${
+                                          step.icon
+                                        }"/>
+                                    </svg>
+                                </div>
+                                <div class="next-card-title">${step.title}</div>
+                                <div class="next-card-desc">${step.desc}</div>
+                                <div class="next-card-arrow">Read more →</div>
+                            </a>
+                        `;
+            });
+
+            html += "</div></div>";
+            nextStepsEl.innerHTML = html;
+          },
+
+          generateJumpMenu() {
+            const contentEl = document.getElementById("content");
+            const headings = contentEl.querySelectorAll("h2, h3");
+            const jumpList = document.getElementById("jump-list");
+
+            jumpList.innerHTML = "";
+
+            headings.forEach((heading, index) => {
+              const id = `heading-${index}`;
+              heading.id = id;
+
+              const li = document.createElement("li");
+              const a = document.createElement("a");
+              a.href = `#${id}`;
+              a.className = `jump-link ${
+                heading.tagName === "H3" ? "level-3" : ""
+              }`;
+              a.textContent = heading.textContent;
+              a.onclick = (e) => {
+                e.preventDefault();
+                heading.scrollIntoView({ behavior: "smooth", block: "start" });
+              };
+
+              li.appendChild(a);
+              jumpList.appendChild(li);
+            });
+          },
+
+          updateActiveJump() {
+            const headings = document.querySelectorAll(".prose h2, .prose h3");
+            const jumpLinks = document.querySelectorAll(".jump-link");
+
+            let current = "";
+            headings.forEach((heading) => {
+              const rect = heading.getBoundingClientRect();
+              if (rect.top <= 100) {
+                current = heading.id;
+              }
+            });
+
+            jumpLinks.forEach((link) => {
+              link.classList.remove("active");
+              if (link.getAttribute("href") === `#${current}`) {
+                link.classList.add("active");
+              }
+            });
+          },
+
+          search() {
+            if (this.searchQuery.length < 2) {
+              this.searchResults = [];
+              this.groupedResults = {};
+              return;
+            }
+
+            const results = [];
+            const query = this.searchQuery.toLowerCase();
+
+            // Search through all loaded content
+            Object.entries(this.allContent).forEach(([page, content]) => {
+              let currentSection = "";
+              const lines = content.split("\n");
+
+              lines.forEach((line, index) => {
+                // Track sections (H2 headings)
+                if (line.startsWith("## ")) {
+                  currentSection = line.replace("## ", "").trim();
+                }
+
+                const lowerLine = line.toLowerCase();
+                if (lowerLine.includes(query)) {
+                  // Clean markdown syntax for snippet
+                  const cleanLine = line.replace(/[#*`]/g, "").trim();
+                  if (cleanLine.length > 0) {
+                    const snippet = this.highlightText(
+                      cleanLine.substring(0, 80),
+                      query
+                    );
+                    results.push({
+                      id: `${page}-${index}`,
+                      page: page,
+                      title: currentSection || this.pageTitles[page],
+                      snippet: snippet + (cleanLine.length > 80 ? "..." : ""),
+                      section: this.getSection(page),
+                      sectionName: currentSection,
+                    });
+                  }
+                }
+              });
+            });
+
+            // Remove duplicates and limit
+            const unique = results.filter(
+              (item, index, self) =>
+                index === self.findIndex((t) => t.snippet === item.snippet)
+            );
+
+            this.searchResults = unique.slice(0, 20);
+            this.groupedResults = this.groupBySection(this.searchResults);
+          },
+
+          getSection(page) {
+            if (["introduction", "installation", "basics"].includes(page))
+              return "Getting Started";
+            if (["filters", "async"].includes(page)) return "Core Concepts";
+            return "Integration";
+          },
+
+          groupBySection(results) {
+            return results.reduce((acc, result) => {
+              if (!acc[result.section]) acc[result.section] = [];
+              acc[result.section].push(result);
+              return acc;
+            }, {});
+          },
+
+          highlightText(text, query) {
+            const regex = new RegExp(`(${this.escapeRegex(query)})`, "gi");
+            return text.replace(regex, '<span class="highlight">$1</span>');
+          },
+
+          escapeRegex(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+          },
+
+          goToResult(result) {
+            this.loadPage(result.page);
+            this.searchOpen = false;
+
+            // If there's a section name, scroll to it after page loads
+            if (result.sectionName) {
+              setTimeout(() => {
+                const headings = document.querySelectorAll(
+                  ".prose h2, .prose h3"
+                );
+                headings.forEach((heading) => {
+                  if (heading.textContent.includes(result.sectionName)) {
+                    heading.scrollIntoView({
+                      behavior: "smooth",
+                      block: "start",
+                    });
+                  }
+                });
+              }, 500);
+            }
+          },
+        };
+      }
+
+      // Make instance globally accessible for next steps cards
+      let docsAppInstance;
+      document.addEventListener("alpine:init", () => {
+        docsAppInstance = docsApp();
+        window.docsAppInstance = docsAppInstance;
+      });
+    </script>
+  </body>
+</html>
