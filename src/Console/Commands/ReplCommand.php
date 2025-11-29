@@ -22,13 +22,14 @@ class ReplCommand
         $stdin = fopen('php://stdin', 'r');
         if ($stdin === false) {
             echo "Error: Could not open stdin.\n";
+
             return;
         }
 
         while (true) {
             echo "> ";
             $input = fgets($stdin);
-            
+
             if ($input === false) {
                 break;
             }

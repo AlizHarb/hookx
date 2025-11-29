@@ -29,7 +29,7 @@ trait ZeroCopyDispatch
         // For true zero-copy, HookContext would need to hold a reference.
         // Since PHP 8.3, copy-on-write is very efficient, so this is mostly
         // beneficial if the array is modified in place by listeners.
-        
+
         return $this->dispatch($hookName, $arguments);
     }
 }

@@ -1,12 +1,12 @@
 <?php
 
-use AlizHarb\Hookx\HookManager;
-use AlizHarb\Hookx\Attributes\Hook;
 use AlizHarb\Hookx\Attributes\Async;
 use AlizHarb\Hookx\Attributes\Background;
+use AlizHarb\Hookx\Attributes\Hook;
 use AlizHarb\Hookx\Context\HookContext;
-use AlizHarb\Hookx\Queue\QueueDispatcher;
+use AlizHarb\Hookx\HookManager;
 use AlizHarb\Hookx\Queue\Drivers\SyncDriver;
+use AlizHarb\Hookx\Queue\QueueDispatcher;
 
 class AsyncListener
 {
@@ -34,44 +34,45 @@ class BackgroundListener
 test('async attribute runs in fiber', function () {
     $manager = HookManager::getInstance();
     $manager->reset();
-    
+
     $listener = new AsyncListener();
     $manager->registerObject($listener);
-    
+
     $manager->dispatch('async.event');
-    
+
     expect($listener->executed)->toBeTrue();
 });
 
 test('background attribute pushes to queue', function () {
     $manager = HookManager::getInstance();
     $manager->reset();
-    
+
     // Mock QueueDispatcher
     $driver = new SyncDriver();
-    $dispatcher = new class($driver) extends QueueDispatcher {
+    $dispatcher = new class ($driver) extends QueueDispatcher {
         public bool $dispatched = false;
-        public function dispatch(string $hookName, array $payload = []): void {
+        public function dispatch(string $hookName, array $payload = []): void
+        {
             $this->dispatched = true;
         }
     };
-    
+
     $manager->setQueueDispatcher($dispatcher);
-    
+
     $listener = new BackgroundListener();
     $manager->registerObject($listener);
-    
+
     $manager->dispatch('bg.event');
-    
+
     expect($dispatcher->dispatched)->toBeTrue();
 });
 
 test('background attribute throws exception without dispatcher', function () {
     $manager = HookManager::getInstance();
     $manager->reset();
-    
+
     $listener = new BackgroundListener();
-    
-    expect(fn() => $manager->registerObject($listener))
+
+    expect(fn () => $manager->registerObject($listener))
         ->toThrow(RuntimeException::class);
 });

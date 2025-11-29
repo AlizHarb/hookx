@@ -23,5 +23,6 @@ readonly class Background
     public function __construct(
         public ?string $queue = null,
         public ?string $connection = null,
-    ) {}
+    ) {
+    }
 }

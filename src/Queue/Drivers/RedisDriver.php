@@ -11,7 +11,8 @@ class RedisDriver implements QueueDriverInterface
     public function __construct(
         private \Redis $redis,
         private string $queueName = 'hookx_queue'
-    ) {}
+    ) {
+    }
 
     /**
      * Push a job onto the queue.

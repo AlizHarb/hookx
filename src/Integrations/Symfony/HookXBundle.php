@@ -24,7 +24,7 @@ class HookXBundle extends Bundle
         $definition = new Definition(HookManager::class);
         $definition->setFactory([HookManager::class, 'getInstance']);
         $definition->setPublic(true);
-        
+
         $container->setDefinition(HookManager::class, $definition);
         $container->setAlias('hookx', HookManager::class);
     }

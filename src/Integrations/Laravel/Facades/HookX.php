@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static mixed applyFilters(string $filterName, mixed $value, array<string, mixed> $arguments = [])
  * @method static void addFilter(string $filterName, callable $callback, int $priority = 10)
  * @method static void registerObject(object $object)
- * 
+ *
  * @see \AlizHarb\Hookx\HookManager
  */
 class HookX extends Facade

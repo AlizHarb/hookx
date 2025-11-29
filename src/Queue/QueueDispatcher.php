@@ -8,7 +8,8 @@ class QueueDispatcher
 {
     public function __construct(
         private QueueDriverInterface $driver
-    ) {}
+    ) {
+    }
 
     /**
      * Dispatch a job to the queue.

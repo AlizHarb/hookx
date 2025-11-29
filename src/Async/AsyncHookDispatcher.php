@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace AlizHarb\Hookx\Async;
 
-use AlizHarb\Hookx\Context\HookContext;
 use AlizHarb\Hookx\HookManager;
 use Fiber;
 
@@ -22,7 +21,8 @@ class AsyncHookDispatcher
      */
     public function __construct(
         private HookManager $hookManager,
-    ) {}
+    ) {
+    }
 
     /**
      * Dispatch a hook asynchronously.

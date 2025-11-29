@@ -31,7 +31,7 @@ class HookXServiceProvider extends ServiceProvider
         Blade::directive('hook', function ($expression) {
             return "<?php app('hookx')->dispatch({$expression}); ?>";
         });
-        
+
         // Register Blade directive for filters: @filter('filter.name', $value)
         Blade::directive('filter', function ($expression) {
             return "<?php echo app('hookx')->applyFilters({$expression}); ?>";

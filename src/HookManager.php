@@ -54,6 +54,7 @@ class HookManager
         if (self::$instance === null) {
             self::$instance = new self();
         }
+
         return self::$instance;
     }
 
@@ -120,7 +121,7 @@ class HookManager
 
     /**
      * Logger closure.
-     * @var (Closure(string $message, array<string, mixed> $context): void)|null
+     * @var (Closure(string, array<string, mixed>): void)|null
      */
     private ?Closure $logger = null;
 
@@ -172,7 +173,7 @@ class HookManager
         // 1. Exact Match
         if (isset($this->listeners[$hookName])) {
             foreach ($this->listeners[$hookName] as $priority => $callbacks) {
-                if (!isset($listenersToRun[$priority])) {
+                if (! isset($listenersToRun[$priority])) {
                     $listenersToRun[$priority] = [];
                 }
                 $listenersToRun[$priority] = array_merge($listenersToRun[$priority], $callbacks);
@@ -190,7 +191,7 @@ class HookManager
                 $pattern = '#^' . str_replace('\*', '.*', preg_quote($registeredHook, '#')) . '$#';
                 if (preg_match($pattern, $hookName)) {
                     foreach ($priorityGroups as $priority => $callbacks) {
-                        if (!isset($listenersToRun[$priority])) {
+                        if (! isset($listenersToRun[$priority])) {
                             $listenersToRun[$priority] = [];
                         }
                         $listenersToRun[$priority] = array_merge($listenersToRun[$priority], $callbacks);
@@ -201,7 +202,7 @@ class HookManager
             elseif (str_starts_with($registeredHook, '#') || str_starts_with($registeredHook, '/')) {
                 if (preg_match($registeredHook, $hookName)) {
                     foreach ($priorityGroups as $priority => $callbacks) {
-                        if (!isset($listenersToRun[$priority])) {
+                        if (! isset($listenersToRun[$priority])) {
                             $listenersToRun[$priority] = [];
                         }
                         $listenersToRun[$priority] = array_merge($listenersToRun[$priority], $callbacks);
@@ -215,6 +216,7 @@ class HookManager
                 throw new \RuntimeException("No listeners found for hook: {$hookName}");
             }
             $this->log("No listeners found for hook: {$hookName}");
+
             return $context;
         }
 
@@ -226,6 +228,7 @@ class HookManager
             foreach ($priorityGroup as $callback) {
                 if ($context->isPropagationStopped()) {
                     $this->log("Propagation stopped for hook: {$hookName}");
+
                     break 2;
                 }
                 $callback($context);
@@ -253,7 +256,7 @@ class HookManager
      */
     public function applyFilters(string $filterName, mixed $value, array $arguments = []): mixed
     {
-        if (!isset($this->filters[$filterName])) {
+        if (! isset($this->filters[$filterName])) {
             return $value;
         }
 
@@ -307,7 +310,7 @@ class HookManager
                 $callback = [$object, $method->getName()];
 
                 // Handle #[Async]
-                if (!empty($asyncAttr)) {
+                if (! empty($asyncAttr)) {
                     $originalCallback = $callback;
                     $callback = function (HookContext $context) use ($originalCallback) {
                         $fiber = new \Fiber(function () use ($originalCallback, $context) {
@@ -318,20 +321,20 @@ class HookManager
                 }
 
                 // Handle #[Background]
-                if (!empty($backgroundAttr)) {
-                    if (!$this->queueDispatcher) {
+                if (! empty($backgroundAttr)) {
+                    if (! $this->queueDispatcher) {
                         throw new \RuntimeException("QueueDispatcher not configured but #[Background] attribute used.");
                     }
                     $bgInst = $backgroundAttr[0]->newInstance();
                     $originalCallback = $callback; // Could be the async wrapped one? Usually mutually exclusive.
-                    
+
                     // Note: Serializing the callback/object for queue is complex.
                     // For now, we assume the queue driver handles the payload.
                     // But typically we'd push a job class, not a closure.
                     // Since we can't easily serialize the object method call without more context,
                     // we'll push a generic job payload that the worker needs to know how to handle.
                     // OR: We just execute the dispatch on the queue dispatcher.
-                    
+
                     $callback = function (HookContext $context) use ($inst) {
                         if ($this->queueDispatcher) {
                             $this->queueDispatcher->dispatch($inst->name, $context->getArguments());

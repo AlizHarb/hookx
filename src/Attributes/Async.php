@@ -19,5 +19,7 @@ readonly class Async
     /**
      * Create a new Async attribute instance.
      */
-    public function __construct() {}
+    public function __construct()
+    {
+    }
 }

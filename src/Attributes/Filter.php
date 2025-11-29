@@ -23,5 +23,6 @@ readonly class Filter
     public function __construct(
         public string $name,
         public int $priority = 10,
-    ) {}
+    ) {
+    }
 }

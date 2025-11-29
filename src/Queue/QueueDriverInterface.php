@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace AlizHarb\Hookx\Queue;
 
-use Closure;
-
 interface QueueDriverInterface
 {
     /**

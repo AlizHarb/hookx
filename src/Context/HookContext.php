@@ -30,7 +30,8 @@ class HookContext implements ArrayAccess
     public function __construct(
         public readonly string $hookName,
         private array $arguments = [],
-    ) {}
+    ) {
+    }
 
     /**
      * Create a new context with modified arguments using PHP 8.5 clone with.

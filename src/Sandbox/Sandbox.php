@@ -71,6 +71,7 @@ class Sandbox
             return $callback(...$args);
         } catch (Throwable $e) {
             error_log("Filter execution failed: " . $e->getMessage());
+
             return $args[0] ?? null; // Return original value or null on failure
         }
     }

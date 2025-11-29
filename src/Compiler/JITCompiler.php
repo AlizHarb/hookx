@@ -32,16 +32,16 @@ class JITCompiler
 
         // Reverse the array to build the chain from the inside out
         $chain = null;
-        
+
         foreach (array_reverse($callbacks) as $callback) {
             $next = $chain;
             $chain = function (HookContext $context) use ($callback, $next) {
                 if ($context->isPropagationStopped()) {
                     return;
                 }
-                
+
                 $callback($context);
-                
+
                 if ($next) {
                     $next($context);
                 }

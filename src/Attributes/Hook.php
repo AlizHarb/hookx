@@ -25,5 +25,6 @@ readonly class Hook
         public string $name,
         public int $priority = 10,
         public bool $once = false,
-    ) {}
+    ) {
+    }
 }

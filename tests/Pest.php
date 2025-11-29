@@ -49,6 +49,6 @@ function freshHookManager(): HookManager
     $reflection = new ReflectionClass(HookManager::class);
     $instance = $reflection->getProperty('instance');
     $instance->setValue(null, null);
-    
+
     return HookManager::getInstance();
 }

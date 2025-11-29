@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use AlizHarb\Hookx\HookManager;
 use AlizHarb\Hookx\Context\HookContext;
+use AlizHarb\Hookx\HookManager;
 
-if (!function_exists('hook')) {
+if (! function_exists('hook')) {
     /**
      * Dispatch a hook.
      *
@@ -19,7 +19,7 @@ if (!function_exists('hook')) {
     }
 }
 
-if (!function_exists('filter')) {
+if (! function_exists('filter')) {
     /**
      * Apply filters to a value.
      *
