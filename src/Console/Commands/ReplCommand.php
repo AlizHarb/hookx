@@ -8,6 +8,11 @@ use AlizHarb\Hookx\HookManager;
 
 class ReplCommand
 {
+    /**
+     * Execute the REPL loop.
+     *
+     * @return void
+     */
     public function execute(): void
     {
         echo "HookX Interactive REPL\n";
@@ -15,10 +20,20 @@ class ReplCommand
 
         $manager = HookManager::getInstance();
         $stdin = fopen('php://stdin', 'r');
+        if ($stdin === false) {
+            echo "Error: Could not open stdin.\n";
+            return;
+        }
 
         while (true) {
             echo "> ";
-            $line = trim(fgets($stdin));
+            $input = fgets($stdin);
+            
+            if ($input === false) {
+                break;
+            }
+
+            $line = trim($input);
 
             if ($line === 'exit') {
                 break;

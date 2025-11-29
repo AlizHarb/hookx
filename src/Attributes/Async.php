@@ -16,5 +16,8 @@ use Attribute;
 #[Attribute(Attribute::TARGET_METHOD)]
 readonly class Async
 {
+    /**
+     * Create a new Async attribute instance.
+     */
     public function __construct() {}
 }

@@ -8,6 +8,12 @@ use AlizHarb\Hookx\HookManager;
 
 class Application
 {
+    /**
+     * Run the console application.
+     *
+     * @param array<int, string> $argv
+     * @return void
+     */
     public function run(array $argv): void
     {
         $command = $argv[1] ?? 'help';

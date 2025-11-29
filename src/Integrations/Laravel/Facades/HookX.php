@@ -8,9 +8,9 @@ use AlizHarb\Hookx\HookManager;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static \AlizHarb\Hookx\Context\HookContext dispatch(string $hookName, array $arguments = [])
+ * @method static \AlizHarb\Hookx\Context\HookContext dispatch(string $hookName, array<string, mixed> $arguments = [])
  * @method static void on(string $hookName, callable $callback, int $priority = 10)
- * @method static mixed applyFilters(string $filterName, mixed $value, array $arguments = [])
+ * @method static mixed applyFilters(string $filterName, mixed $value, array<string, mixed> $arguments = [])
  * @method static void addFilter(string $filterName, callable $callback, int $priority = 10)
  * @method static void registerObject(object $object)
  * 

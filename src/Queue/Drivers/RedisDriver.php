@@ -13,6 +13,13 @@ class RedisDriver implements QueueDriverInterface
         private string $queueName = 'hookx_queue'
     ) {}
 
+    /**
+     * Push a job onto the queue.
+     *
+     * @param string               $jobName
+     * @param array<string|int, mixed> $payload
+     * @return void
+     */
     public function push(string $jobName, array $payload): void
     {
         $data = json_encode([

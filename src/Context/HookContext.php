@@ -35,7 +35,7 @@ class HookContext implements ArrayAccess
     /**
      * Create a new context with modified arguments using PHP 8.5 clone with.
      *
-     * @param array $newArguments
+     * @param array<string|int, mixed> $newArguments
      * @return self
      */
     public function with(array $newArguments): self
@@ -106,7 +106,7 @@ class HookContext implements ArrayAccess
     /**
      * Check if an offset exists (ArrayAccess).
      *
-     * @param mixed $offset
+     * @param string|int $offset
      * @return bool
      */
     public function offsetExists(mixed $offset): bool
@@ -118,7 +118,7 @@ class HookContext implements ArrayAccess
     /**
      * Get an offset value (ArrayAccess).
      *
-     * @param mixed $offset
+     * @param string|int $offset
      * @return mixed
      */
     public function offsetGet(mixed $offset): mixed
@@ -130,8 +130,8 @@ class HookContext implements ArrayAccess
     /**
      * Set an offset value (ArrayAccess).
      *
-     * @param mixed $offset
-     * @param mixed $value
+     * @param string|int|null $offset
+     * @param mixed           $value
      * @return void
      */
     public function offsetSet(mixed $offset, mixed $value): void
@@ -147,7 +147,7 @@ class HookContext implements ArrayAccess
     /**
      * Unset an offset (ArrayAccess).
      *
-     * @param mixed $offset
+     * @param string|int $offset
      * @return void
      */
     public function offsetUnset(mixed $offset): void

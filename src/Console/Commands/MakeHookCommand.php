@@ -6,6 +6,12 @@ namespace AlizHarb\Hookx\Console\Commands;
 
 class MakeHookCommand
 {
+    /**
+     * Execute the command.
+     *
+     * @param string $name
+     * @return void
+     */
     public function execute(string $name): void
     {
         $className = ucfirst($name) . 'Listener';

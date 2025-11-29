@@ -11,8 +11,8 @@ interface QueueDriverInterface
     /**
      * Push a job onto the queue.
      *
-     * @param string $jobName The name of the job (usually the hook name).
-     * @param array  $payload The data to be processed.
+     * @param string               $jobName The name of the job (usually the hook name).
+     * @param array<string|int, mixed> $payload The data to be processed.
      *
      * @return void
      */

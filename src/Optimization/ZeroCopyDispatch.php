@@ -20,8 +20,8 @@ trait ZeroCopyDispatch
     /**
      * Dispatch a hook with arguments passed by reference.
      *
-     * @param string $hookName
-     * @param array  $arguments
+     * @param string               $hookName
+     * @param array<string, mixed> $arguments
      * @return HookContext
      */
     public function dispatchZeroCopy(string $hookName, array &$arguments): HookContext

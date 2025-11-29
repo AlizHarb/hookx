@@ -20,6 +20,8 @@ use ReflectionMethod;
  */
 class HookManager
 {
+    use Optimization\ZeroCopyDispatch;
+
     /**
      * The singleton instance.
      * @var self|null
@@ -118,7 +120,7 @@ class HookManager
 
     /**
      * Logger closure.
-     * @var (Closure(string $message, array $context): void)|null
+     * @var (Closure(string $message, array<string, mixed> $context): void)|null
      */
     private ?Closure $logger = null;
 
@@ -136,8 +138,8 @@ class HookManager
     /**
      * Log a message if a logger is configured.
      *
-     * @param string $message
-     * @param array  $context
+     * @param string               $message
+     * @param array<string, mixed> $context
      * @return void
      */
     private function log(string $message, array $context = []): void
@@ -266,16 +268,6 @@ class HookManager
     }
 
     /**
-     * Register hooks and filters defined in an object using attributes.
-     *
-     * Scans the object's public methods for #[Hook] and #[Filter] attributes
-     * and registers them accordingly.
-     *
-     * @param object $object The object to scan.
-     *
-     * @return void
-     */
-    /**
      * @var \AlizHarb\Hookx\Queue\QueueDispatcher|null
      */
     private ?\AlizHarb\Hookx\Queue\QueueDispatcher $queueDispatcher = null;
@@ -340,8 +332,10 @@ class HookManager
                     // we'll push a generic job payload that the worker needs to know how to handle.
                     // OR: We just execute the dispatch on the queue dispatcher.
                     
-                    $callback = function (HookContext $context) use ($inst, $bgInst) {
-                        $this->queueDispatcher->dispatch($inst->name, $context->getArguments());
+                    $callback = function (HookContext $context) use ($inst) {
+                        if ($this->queueDispatcher) {
+                            $this->queueDispatcher->dispatch($inst->name, $context->getArguments());
+                        }
                     };
                 }
 

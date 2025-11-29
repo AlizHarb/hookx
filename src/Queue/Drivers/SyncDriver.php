@@ -11,8 +11,8 @@ class SyncDriver implements QueueDriverInterface
     /**
      * Push a job onto the queue (executes immediately for Sync).
      *
-     * @param string $jobName
-     * @param array  $payload
+     * @param string               $jobName
+     * @param array<string|int, mixed> $payload
      *
      * @return void
      */

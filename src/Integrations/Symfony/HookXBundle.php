@@ -11,6 +11,12 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class HookXBundle extends Bundle
 {
+    /**
+     * Build the bundle.
+     *
+     * @param ContainerBuilder $container
+     * @return void
+     */
     public function build(ContainerBuilder $container): void
     {
         parent::build($container);
