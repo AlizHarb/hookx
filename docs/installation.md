@@ -1,32 +1,49 @@
 # Installation
 
-## Requirements
+Getting started with HookX is simple.
 
-- PHP 8.5 or higher
-- Composer (optional)
+## Composer
 
-## Via Composer
-
-The recommended way to install Hookx is via Composer:
+Install the package via Composer:
 
 ```bash
 composer require alizharb/hookx
 ```
 
-## Standalone
-
-If you are not using Composer, you can download the source code and include the autoloader manually:
-
-```php
-require '/path/to/hookx/src/autoload.php';
-```
-
 ## Configuration
 
-Hookx works out of the box with zero configuration. However, you can configure the `HookManager` singleton if needed.
+HookX is designed to work out of the box with zero configuration for basic usage. However, for advanced features like Background Hooks, you may need to configure your drivers.
+
+### Setting up Redis (Optional)
+
+If you plan to use the Redis driver for background hooks, ensure you have the `redis` extension installed and a running Redis instance.
+
+```bash
+pecl install redis
+```
+
+## Integration
+
+### Standalone
 
 ```php
 use AlizHarb\Hookx\HookManager;
 
-$manager = HookManager::getInstance();
+$hooks = HookManager::getInstance();
 ```
+
+### Laravel
+
+Publish the configuration file (coming soon in v1.1.0):
+
+```bash
+php artisan vendor:publish --tag=hookx-config
+```
+
+### Symfony
+
+Register the bundle in `config/bundles.php` (coming soon in v1.1.0).
+
+## Next Steps
+
+Once installed, head over to the [Basic Usage](basics.md) guide to write your first hook.

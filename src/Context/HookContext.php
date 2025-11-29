@@ -33,6 +33,20 @@ class HookContext implements ArrayAccess
     ) {}
 
     /**
+     * Create a new context with modified arguments using PHP 8.5 clone with.
+     *
+     * @param array $newArguments
+     * @return self
+     */
+    public function with(array $newArguments): self
+    {
+        return new self(
+            $this->hookName,
+            array_merge($this->arguments, $newArguments)
+        );
+    }
+
+    /**
      * Stop the propagation of the hook.
      * Subsequent listeners will not be executed.
      *

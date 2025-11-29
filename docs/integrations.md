@@ -1,79 +1,58 @@
 # Framework Integrations
 
-HookX is designed to be framework-agnostic while providing first-class support for popular PHP ecosystems.
+HookX is framework-agnostic, but we provide first-class support for the most popular PHP ecosystems.
 
----
+## Laravel
 
-## Supported Frameworks
+**Status:** Coming in v1.1.0
 
-We provide dedicated integration guides for the following frameworks:
+The Laravel integration will provide:
 
-### [Laravel](laravel)
+- **Service Provider**: Automatically registers the `HookManager` singleton.
+- **Facade**: `HookX::dispatch('event')`.
+- **Blade Directive**: `@hook('template.header')` to allow plugins to inject HTML into your views.
+- **Event Bridge**: Listen to native Laravel events and dispatch them as HookX hooks.
 
-Seamless integration with Laravel's service container and event system.
+### Manual Setup (Current)
 
-- **Service Provider** setup
-- **Dependency Injection** support
-- Bridge for native **Laravel Events**
-- **Artisan** commands (coming soon)
-
-### [Symfony](symfony)
-
-Integration with the Symfony ecosystem.
-
-- **Service** registration
-- **Dependency Injection** integration
-- **EventDispatcher** bridging
-- **Profiler** integration (coming soon)
-
-### [WordPress](wordpress)
-
-Modernize your WordPress plugin or theme development.
-
-- Use alongside `add_action` / `add_filter`
-- Object-oriented hook management
-- Attribute-based registration
-- Type-safe hook arguments
-
----
-
-## Standalone Usage
-
-HookX works perfectly in any PHP 8.3+ application without any framework.
-
-### Basic Setup
+You can easily bind HookX in your `AppServiceProvider`.
 
 ```php
+// app/Providers/AppServiceProvider.php
+use AlizHarb\Hookx\HookManager;
+
+public function register()
+{
+    $this->app->singleton(HookManager::class, function () {
+        return HookManager::getInstance();
+    });
+}
+```
+
+## Symfony
+
+**Status:** Coming in v1.1.0
+
+The Symfony bundle will provide:
+
+- **Dependency Injection**: Autowiring for `HookManager`.
+- **Attribute Discovery**: Automatically register services with `#[Hook]` attributes.
+- **Profiler**: A debug toolbar panel to see all dispatched hooks and their execution time.
+
+## WordPress
+
+**Status:** Coming in v1.1.0
+
+Modernize your WordPress development by using HookX instead of `add_action` and `add_filter`.
+
+```php
+// functions.php
 use AlizHarb\Hookx\HookManager;
 
 $hooks = HookManager::getInstance();
 
-// Register your objects
-$hooks->registerObject(new MyListener());
-
-// Dispatch events
-$hooks->dispatch('app.ready');
+// Bridge to WP hooks
+add_action('init', function () use ($hooks) {
+    $hooks->dispatch('wp.init');
+});
 ```
-
-For more details on standalone usage, check out the [Basic Usage](basics) guide.
-
----
-
-## Best Practices
-
-Regardless of which framework you use, follow these general guidelines:
-
-1.  **Dependency Injection**: Always inject `HookManager` where possible instead of using the singleton directly.
-2.  **Attributes**: Use PHP 8 attributes (`#[Hook]`, `#[Filter]`) for cleaner, self-documenting code.
-3.  **Context**: Leverage the `HookContext` object to pass data and control propagation.
-4.  **Type Safety**: Use strict typing in your listener methods to catch errors early.
-
----
-
-## Next Steps
-
-Select your framework to get started:
-
-- [Laravel Integration](laravel)
-- [Symfony Integration](symfony)
-- [WordPress Integration](wordpress)

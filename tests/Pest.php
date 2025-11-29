@@ -48,7 +48,6 @@ function freshHookManager(): HookManager
     // Reset singleton for testing
     $reflection = new ReflectionClass(HookManager::class);
     $instance = $reflection->getProperty('instance');
-    $instance->setAccessible(true);
     $instance->setValue(null, null);
     
     return HookManager::getInstance();

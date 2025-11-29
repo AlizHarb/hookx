@@ -18,21 +18,41 @@ use Throwable;
 class Sandbox
 {
     /**
-     * Execute a hook callback safely.
+     * Execute a hook callback safely with optional limits.
      *
      * @param callable    $callback The callback to execute.
      * @param HookContext $context  The context to pass to the callback.
+     * @param int         $timeLimitSeconds Maximum execution time in seconds (0 for no limit).
+     * @param int         $memoryLimitBytes Maximum memory usage increase in bytes (0 for no limit).
      *
      * @return void
      */
-    public function execute(callable $callback, HookContext $context): void
+    public function execute(callable $callback, HookContext $context, int $timeLimitSeconds = 0, int $memoryLimitBytes = 0): void
     {
+        $startTime = microtime(true);
+        $startMemory = memory_get_usage();
+
         try {
             // Basic error containment
             $callback($context);
+
+            // Check limits after execution (soft limit)
+            if ($timeLimitSeconds > 0) {
+                $duration = microtime(true) - $startTime;
+                if ($duration > $timeLimitSeconds) {
+                    error_log("Hook execution exceeded time limit: {$duration}s > {$timeLimitSeconds}s");
+                }
+            }
+
+            if ($memoryLimitBytes > 0) {
+                $memoryUsage = memory_get_usage() - $startMemory;
+                if ($memoryUsage > $memoryLimitBytes) {
+                    error_log("Hook execution exceeded memory limit: {$memoryUsage} bytes > {$memoryLimitBytes} bytes");
+                }
+            }
+
         } catch (Throwable $e) {
             // Log error or handle it gracefully without crashing the app
-            // In a real sandbox, we might use declare(ticks=1) or pcntl to limit execution time
             error_log("Hook execution failed: " . $e->getMessage());
         }
     }

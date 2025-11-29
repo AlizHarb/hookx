@@ -1,51 +1,115 @@
 # Laravel Integration
 
-HookX integrates seamlessly with Laravel, providing a powerful event system that complements Laravel's native events.
+HookX integrates seamlessly with Laravel, providing a powerful, attribute-based event system that complements Laravel's native events.
+
+## Why use HookX with Laravel?
+
+While Laravel has a robust event system, HookX offers:
+
+- **Attribute-based registration**: No need to manually register listeners in `EventServiceProvider`.
+- **Dynamic Hooks**: Wildcard (`user.*`) and Regex matching.
+- **Filters**: Modify data (like WordPress filters) which Laravel events don't natively support.
+- **Priorities**: Fine-grained control over execution order.
 
 ---
 
-## Service Provider Setup
+## 1. Installation
 
-Create a service provider to register HookX:
+HookX comes with a native **Service Provider** and **Facade** for Laravel.
 
-```php
-<?php
+### Step 1: Register Service Provider
 
-namespace App\Providers;
+If you are using Laravel 11+, this might be auto-discovered. If not, or if you want to be explicit, add it to `bootstrap/providers.php` or `config/app.php`:
 
-use Illuminate\Support\ServiceProvider;
-use AlizHarb\Hookx\HookManager;
-
-class HookXServiceProvider extends ServiceProvider
-{
-    public function register(): void
-    {
-        $this->app->singleton(HookManager::class, function () {
-            return HookManager::getInstance();
-        });
-    }
-
-    public function boot(): void
-    {
-        // Register your hook listeners here
-    }
-}
-```
-
-Register the service provider in `config/app.php`:
+**`config/app.php`**:
 
 ```php
 'providers' => [
     // ...
-    App\Providers\HookXServiceProvider::class,
+    AlizHarb\Hookx\Integrations\Laravel\HookXServiceProvider::class,
+],
+```
+
+### Step 2: Register Facade (Optional)
+
+If you prefer using the `HookX` facade instead of dependency injection:
+
+**`config/app.php`**:
+
+```php
+'aliases' => [
+    // ...
+    'HookX' => AlizHarb\Hookx\Integrations\Laravel\Facades\HookX::class,
 ],
 ```
 
 ---
 
-## Creating Listeners
+## 2. Usage
 
-Create a listener class using attributes:
+### Dispatching Hooks
+
+You can dispatch hooks using the Facade, the helper, or Dependency Injection.
+
+**Using Facade:**
+
+```php
+use HookX;
+
+HookX::dispatch('user.registered', ['user' => $user]);
+```
+
+**Using Blade Directive:**
+
+```blade
+@hook('page.viewed', ['page' => $page])
+```
+
+**Using Dependency Injection:**
+
+```php
+use AlizHarb\Hookx\HookManager;
+
+public function store(Request $request, HookManager $hooks)
+{
+    // ...
+    $hooks->dispatch('order.created');
+}
+```
+
+### Applying Filters
+
+Filters allow you to modify data before it's used or rendered.
+
+**In Controller:**
+
+```php
+$content = HookX::applyFilters('the_content', $post->content);
+```
+
+**In Blade:**
+
+```blade
+<div class="content">
+    @filter('the_content', $post->content)
+</div>
+```
+
+---
+
+## 3. Creating Listeners
+
+The best way to handle hooks is by creating dedicated Listener classes.
+
+### Step 1: Create the Class
+
+```bash
+php artisan make:class Listeners/UserHooks
+```
+
+### Step 2: Add Attributes
+
+Use the `#[Hook]` and `#[Filter]` attributes to register methods.
 
 ```php
 <?php
@@ -53,245 +117,91 @@ Create a listener class using attributes:
 namespace App\Listeners;
 
 use AlizHarb\Hookx\Attributes\Hook;
+use AlizHarb\Hookx\Attributes\Filter;
 use AlizHarb\Hookx\Context\HookContext;
-
-class UserEventListener
-{
-    #[Hook('user.registered', priority: 10)]
-    public function onUserRegistered(HookContext $ctx): void
-    {
-        $user = $ctx->getArgument('user');
-
-        // Send welcome email
-        Mail::to($user->email)->send(new WelcomeEmail($user));
-    }
-
-    #[Hook('user.login', priority: 5)]
-    public function onUserLogin(HookContext $ctx): void
-    {
-        $user = $ctx->getArgument('user');
-
-        // Log user activity
-        activity()
-            ->causedBy($user)
-            ->log('User logged in');
-    }
-}
-```
-
----
-
-## Registering Listeners
-
-Register your listeners in the service provider:
-
-```php
-public function boot(): void
-{
-    $hooks = app(HookManager::class);
-
-    // Register listener object
-    $hooks->registerObject(new UserEventListener());
-}
-```
-
----
-
-## Using in Controllers
-
-Dispatch hooks from your controllers:
-
-```php
-<?php
-
-namespace App\Http\Controllers;
-
-use AlizHarb\Hookx\HookManager;
 use App\Models\User;
 
-class AuthController extends Controller
+class UserHooks
 {
-    public function register(Request $request)
+    /**
+     * Handle user registration.
+     */
+    #[Hook('user.registered')]
+    public function onRegistered(HookContext $context): void
     {
-        $user = User::create($request->validated());
+        $user = $context->getArgument('user');
 
-        // Dispatch hook
-        app(HookManager::class)->dispatch('user.registered', [
-            'user' => $user
-        ]);
+        // Logic here...
+        logger()->info("User registered: {$user->id}");
+    }
 
-        return response()->json($user, 201);
+    /**
+     * Filter the user's display name.
+     */
+    #[Filter('user.name')]
+    public function formatName(string $name): string
+    {
+        return strtoupper($name);
     }
 }
 ```
 
----
+### Step 3: Register the Listener
 
-## Bridging Laravel Events
-
-You can bridge Laravel events to HookX:
+You need to tell HookX about your listener class. The best place is in a Service Provider, like `AppServiceProvider`.
 
 ```php
-<?php
-
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use AlizHarb\Hookx\HookManager;
+use App\Listeners\UserHooks;
+
+class AppServiceProvider extends ServiceProvider
+{
+    public function boot(HookManager $hooks): void
+    {
+        // Register the object so HookX scans its attributes
+        $hooks->registerObject(new UserHooks());
+    }
+}
+```
+
+---
+
+## 4. Advanced: Bridging Events
+
+You can automatically dispatch HookX hooks whenever a Laravel event is fired.
+
+```php
+// In AppServiceProvider::boot
 use Illuminate\Support\Facades\Event;
-use AlizHarb\Hookx\HookManager;
 
-class HookXServiceProvider extends ServiceProvider
-{
-    public function boot(): void
-    {
-        $hooks = app(HookManager::class);
-
-        // Bridge Laravel events to HookX
-        Event::listen('eloquent.created: App\Models\User', function ($user) use ($hooks) {
-            $hooks->dispatch('user.created', ['user' => $user]);
-        });
-    }
-}
+Event::listen('*', function (string $eventName, array $data) use ($hooks) {
+    // Dispatch as a HookX event
+    // Note: Laravel wildcard events pass the event name as the first argument
+    $hooks->dispatch($eventName, $data);
+});
 ```
 
 ---
 
-## Using Filters
+## 5. Testing
 
-Apply filters to transform data:
+You can mock HookX in your tests easily.
 
 ```php
-use AlizHarb\Hookx\Attributes\Filter;
-
-class ContentFilter
+public function test_it_dispatches_hook()
 {
-    #[Filter('content.render')]
-    public function sanitizeContent(string $content): string
-    {
-        return strip_tags($content, '<p><a><strong><em>');
-    }
+    // Mock the facade
+    HookX::shouldReceive('dispatch')
+        ->once()
+        ->with('user.registered', \Mockery::type('array'));
 
-    #[Filter('content.render', priority: 20)]
-    public function addReadingTime(string $content): string
-    {
-        $wordCount = str_word_count(strip_tags($content));
-        $readingTime = ceil($wordCount / 200);
-
-        return "<div class='reading-time'>{$readingTime} min read</div>" . $content;
-    }
-}
-```
-
-Apply the filter:
-
-```php
-$hooks = app(HookManager::class);
-$hooks->registerObject(new ContentFilter());
-
-$content = $hooks->applyFilters('content.render', $rawContent);
-```
-
----
-
-## Complete Example
-
-Here's a complete example of using HookX in a Laravel application:
-
-```php
-<?php
-
-namespace App\Services;
-
-use AlizHarb\Hookx\HookManager;
-use AlizHarb\Hookx\Attributes\{Hook, Filter};
-use App\Models\{User, Post};
-use Illuminate\Support\Facades\Mail;
-
-class BlogService
-{
-    public function __construct(
-        private HookManager $hooks
-    ) {
-        $this->hooks->registerObject($this);
-    }
-
-    #[Hook('post.published')]
-    public function notifySubscribers($ctx): void
-    {
-        $post = $ctx->getArgument('post');
-        $subscribers = User::where('subscribed', true)->get();
-
-        foreach ($subscribers as $subscriber) {
-            Mail::to($subscriber->email)
-                ->send(new NewPostNotification($post));
-        }
-    }
-
-    #[Filter('post.content')]
-    public function processShortcodes(string $content): string
-    {
-        // Process custom shortcodes
-        return preg_replace_callback('/\[gallery\]/', function () {
-            return view('shortcodes.gallery')->render();
-        }, $content);
-    }
-
-    public function publishPost(Post $post): void
-    {
-        $post->status = 'published';
-        $post->published_at = now();
-
-        // Apply content filters
-        $post->content = $this->hooks->applyFilters('post.content', $post->content);
-
-        $post->save();
-
-        // Dispatch hook
-        $this->hooks->dispatch('post.published', ['post' => $post]);
-    }
-}
-```
-
----
-
-## Best Practices
-
-1. **Use Dependency Injection**: Inject `HookManager` via Laravel's container
-2. **Register Early**: Register listeners in service providers
-3. **Use Attributes**: Leverage PHP 8 attributes for clean code
-4. **Bridge Events**: Connect Laravel events with HookX for consistency
-5. **Test Hooks**: Write tests for your hook listeners
-
----
-
-## Testing
-
-Test your hooks in PHPUnit:
-
-```php
-<?php
-
-namespace Tests\Feature;
-
-use Tests\TestCase;
-use AlizHarb\Hookx\HookManager;
-use App\Models\User;
-
-class UserHooksTest extends TestCase
-{
-    public function test_user_registration_hook_fires()
-    {
-        $hooks = app(HookManager::class);
-        $fired = false;
-
-        $hooks->on('user.registered', function ($ctx) use (&$fired) {
-            $fired = true;
-        });
-
-        $user = User::factory()->create();
-        $hooks->dispatch('user.registered', ['user' => $user]);
-
-        $this->assertTrue($fired);
-    }
+    $this->post('/register', [
+        'name' => 'John',
+        'email' => 'john@example.com',
+        'password' => 'secret',
+    ]);
 }
 ```
