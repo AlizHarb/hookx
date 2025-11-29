@@ -19,8 +19,8 @@
         "illuminate/support": "^12.40",
         "pestphp/pest": "^3.0",
         "phpstan/phpstan": "^2.1",
-        "symfony/dependency-injection": "^8.0",
-        "symfony/http-kernel": "^7.4",
+        "symfony/dependency-injection": "^7.0",
+        "symfony/http-kernel": "^7.0",
         "symfony/var-dumper": "^7.0"
     },
     "autoload": {
@@ -44,6 +44,9 @@
         "analyse": "php -d memory_limit=2G vendor/bin/phpstan analyse"
     },
     "config": {
+        "platform": {
+            "php": "8.3"
+        },
         "allow-plugins": {
             "pestphp/pest-plugin": true
         },
